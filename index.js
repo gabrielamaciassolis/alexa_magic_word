@@ -18,18 +18,17 @@ const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
                         "apartment"
                     ];
                     
-    const list_words = {
-        'animal':['DOG','CAT'],
-        'color':['BLUE','YELLOW'],
-        'school thing':['PENCIL','NOTEBOOK']
-    };
+    const list_words = [
+       {type:'animal', values:['DOG','CAT']},
+       {type: 'color', values:['BLUE','YELLOW']},
+       {type: 'school thing', values :['PENCIL','NOTEBOOK']}
+    ];
                     
                     
     var cw_index =0;
     var magic_word = '';
         
 const handlers = {
-
     'LaunchRequest': function () {
         this.emit('GetFact');
     },
@@ -38,10 +37,12 @@ const handlers = {
     },
     'GetFact': function () {
 
-      console.log('hola');
+      console.log('GetFact');
 
-        cw_index = 1; //Math.floor(Math.random() * 3);
+        cw_index = 0; //Math.floor(Math.random() * 3);
         magic_word = word_english[cw_index];
+        
+         console.log('GetFact + ', list_words[1].type);
         
           this.response
          .speak('Okay, Lets start with the first Word. It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
@@ -52,7 +53,11 @@ const handlers = {
     },
  'AnswerIntent': function() {
      
-  var lt =    this.event.request.intent.slots.letter.value;
+    console.log('AnswerIntent');
+     
+  var lt =  this.event.request.intent.slots.letter.value;
+  
+  
       lt = lt.replace('.', '');
   var lt_string = lt.toUpperCase();
   var cw_c = magic_word.split(lt_string).length - 1;
