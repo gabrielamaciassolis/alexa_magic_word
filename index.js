@@ -17,36 +17,62 @@ const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
                         "girl",
                         "apartment"
                     ];
-                    
+     // Next Levels will have more letters              
     const list_words = [
-       {type:'animal', values:['DOG','CAT']},
-       {type: 'color', values:['BLUE','YELLOW']},
-       {type: 'school thing', values :['PENCIL','NOTEBOOK']}
+       {type:'an animal', values:['DOG','CAT']},
+       {type: 'a color', values:['BLUE','YELLOW']},
+       {type: ' a school thing', values :['PENCIL','ERASER']}
     ];
                     
-                    
-    var cw_index =0;
     var magic_word = '';
+    var magic_word_type = '';
+    
+    var clue_counter = 0;
+        
         
 const handlers = {
     'LaunchRequest': function () {
+   
         this.emit('GetFact');
     },
     'GetNewFactIntent': function () {
         this.emit('GetFact');
     },
     'GetFact': function () {
+     console.log('GetFact');
+     var numberCorrectTotal = 0
+     
+     var cw_index   = Math.floor(Math.random() * list_words.length);
+         magic_word_type = list_words[cw_index].type
+     var mw_index   = Math.floor(Math.random() * list_words[cw_index].values.length);
+         magic_word = list_words[cw_index].values[mw_index];
 
-      console.log('GetFact');
-
-        cw_index = 0; //Math.floor(Math.random() * 3);
-        magic_word = word_english[cw_index];
-        
-         console.log('GetFact + ', list_words[1].type);
-        
-          this.response
-         .speak('Okay, Lets start with the first Word. It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
-         .listen('Which letter do you wanna try to guess the word?');
+    if(Object.keys(this.attributes).length === 0) { 
+       this.attributes.wordsscores = {
+         'numberCorrectTotal': 0,
+         'type': {
+         'animal': { 'numberCorrect': 0},
+         'color': { 'numberCorrect': 0},
+         'school thing': { 'numberCorrect': 0}
+         }
+       }; 
+       
+       
+      this.response
+     .speak('Hello! Is Nice to hear you!, <say-as interpret-as="interjection">okey dokey!</say-as>, <say-as interpret-as="interjection">Lets play!</say-as> , Lets find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
+     .listen('Which letter do you wanna try to guess the word?');
+     
+       
+     } else {
+         
+      // Add variable to greetings
+      this.response
+     .speak(' Welcome Back!, I am so happy to hear you again, Your current score is '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points, <say-as interpret-as="interjection">okey dokey!</say-as> <say-as interpret-as="interjection">Lets play!</say-as> find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
+     .listen('Which letter do you wanna try to guess the word?');
+     
+         
+     }
+     
         
          this.emit(':responseReady');
         
@@ -77,20 +103,64 @@ const handlers = {
    
   var feedback =  '';
    
+     console.log('WIN: ' + wd + '-' + magic_word );
+   
    if(wd == magic_word){
-       
-    feedback =   'WOW you did it, The Magic Word was : ' + wd;
+       // variable wahoo  - well done - wow  - yay  - yippee  - bravo - hurray
+    feedback =   '<say-as interpret-as="interjection">WOW!</say-as> you did it, The Magic Word was : ' + wd + 'Your score is '+ this.attributes.wordsscores.numberCorrectTotal +' of Magic Word points!';
+     this.attributes.wordsscores.numberCorrectTotal = this.attributes.wordsscores.numberCorrectTotal + 5 ;
        
    }else{
-     
-     feedback =   'OMM the word :' + wd + ', is not the correct one, the Magic word is: ' + magic_word + ', Try again.' ;  
+     // variables  good luck
+     feedback =   '<say-as interpret-as="interjection">meow!</say-as> the word ' + wd + ', is not the correct one, the Magic word was ' + magic_word + ', <say-as interpret-as="interjection"> it\'s okay!</say-as>, <say-as interpret-as="interjection">Do you want to try Again?</say-as>, just say, Alexa, Start <say-as interpret-as="interjection">Magic Word!</say-as>' ;  
    }
     
      this.response
-         .speak('WOW you did it, The Magic Word was : ' + wd);
+         .speak(feedback);
     
       this.emit(':responseReady');
   },  
+  'ClueIntent': function () {
+  
+      var clue = '';
+      
+      https://s3.amazonaws.com/alexastoryes/magic_word_clue_light.mp3
+      
+    if (magic_word == '')
+    {
+        clue = 'not word to choose, Please say Stop and then say again ,<emphasis level="strong"> Start Magic Word!</emphasis>  '
+        
+    } else{
+    
+   switch (clue_counter) {
+    case 0:
+        clue = 'Here is your clue, It start with '+ magic_word.substring(0, 1)  + '<break time="1s"/>  and finishes with ' + magic_word.substring(magic_word.length-1, magic_word.length) + ' <break time="2s"/>';  
+        break;
+    case 1:
+       clue = 'Here is your clue, <amazon:effect name="whispered"> It is '+ magic_word_type + '</amazon:effect> '; 
+        break;
+    case 2:
+       clue = 'Here is your clue, It has ' + magic_word.length +' letters, Good Look!';  
+        break;
+    case 3:
+        clue = 'Here is your clue, <emphasis level="strong"> It is '+ magic_word_type + '</emphasis> ';
+        break;
+   default:
+    clue_counter = 1;
+     clue = 'Here is your clue, <amazon:effect name="whispered"> It is '+ magic_word_type + '</amazon:effect> ';  
+  }
+   
+   
+    }      
+    
+    clue_counter++;
+      
+   this.response
+     .speak(clue)
+     .listen('Which letter do you wanna try to guess the word?');
+      
+     this.emit(':responseReady');
+    },
     'AMAZON.HelpIntent': function () {
         const speechOutput ='Help Message';
         const reprompt = 'Help Message';
@@ -100,15 +170,21 @@ const handlers = {
         this.emit(':tell', 'Ok, let\'s play again soon.');
     },
     'AMAZON.StopIntent': function () {
-        this.emit(':tell', 'Ok, let\'s play again soon.');
+        
+        // variables:  hip hip hooray
+        this.emit(':tell', 'Ok, let\'s play again soon. Remember!,  you have '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points! ' );
     },
+  'SessionEndedRequest': function() {
+    console.log('session ended!');
+    this.emit(':saveState', true);
+  }
 };
 
 exports.handler = function (event, context) {
     
     const alexa = Alexa.handler(event, context);
     alexa.APP_ID = APP_ID;
-
+    alexa.dynamoDBTableName = 'MagicWordsPoints';
     alexa.registerHandlers(handlers);
     alexa.execute();
 };
