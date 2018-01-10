@@ -8,7 +8,7 @@
 
 const Alexa = require('alexa-sdk');
 
-const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
+const APP_ID = 'amzn1.ask.skill.1aa703da-8470-42f0-adf7-13269c5cb7c1';  // TODO replace with your app ID (OPTIONAL).
 
     const list_words = [
         {type:' an animal ', 
