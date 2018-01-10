@@ -53,7 +53,7 @@ const APP_ID = 'amzn1.ask.skill.1aa703da-8470-42f0-adf7-13269c5cb7c1';  // TODO 
 			'This fruit is green outside and white inside', 'This fruit is so juicy and sweet '
 			]},
 			{name:'BANANA',clues: [
-			'This fruit is yellow from outside', 'This fruit is a little like a cucumber '
+			'This fruit is yellow from outside and white inside', 'This fruit is a little like a cucumber, but is soft and sweet '
 			]}
 	]}
     ];
@@ -98,7 +98,7 @@ const handlers = {
        
        
       this.response
-     .speak(intro +' Hello! Is Nice to hear you!, Get ready with a piece of paper, and a pencil, <say-as interpret-as="interjection">okey dokey!</say-as>, <say-as interpret-as="interjection">Lets play!</say-as> , Lets find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
+     .speak(intro +' Hello! It is Nice to hear you!, Get ready with a piece of paper, and a pencil, <say-as interpret-as="interjection">okey dokey!</say-as>, <say-as interpret-as="interjection">Lets play!</say-as> , Lets find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one, or tell me the magic word, Which one do you wanna try?')
      .listen('Which letter do you wanna try to guess the word?');
      
        
@@ -106,12 +106,12 @@ const handlers = {
         
         var ifScore = '';
         if (this.attributes.wordsscores.numberCorrectTotal > 0)
-       { ifScore =  'Your current score is '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points'}
+       { ifScore =  'Your current score is '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points,'}
     
     
-    // Add Welcome Fraces     
+    // Add Welcome      
       this.response
-     .speak(intro +' Welcome Back!, I am so happy to hear you again,'+ ifScore +', <say-as interpret-as="interjection">okey dokey!</say-as> <say-as interpret-as="interjection">Lets play!</say-as> find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
+     .speak(intro +' Welcome Back!, I am so happy to hear you again, '+ ifScore +' <say-as interpret-as="interjection">okey dokey!</say-as> <say-as interpret-as="interjection">Lets play!</say-as> find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
      .listen('Which letter do you wanna try to guess the word?');
      
          
@@ -127,6 +127,7 @@ const handlers = {
      
   var lt =  this.event.request.intent.slots.letter.value;
   
+  
       lt = lt.replace('.', '');
   var lt_string = lt.toUpperCase();
   var cw_c = magic_word.split(lt_string).length - 1;
@@ -135,15 +136,23 @@ const handlers = {
    
  var listenOnAnswer = '';
  
+ 
    if(cw_c != 0 ){
-    listenOnAnswer = 'Let\'s try another letter or, tell me what is the word you guess is the Magic Word!';
+    listenOnAnswer = 'The letter you said : ' + lt +' is ' + cw_c +' times, Let\'s try another letter or, tell me which one is the word you guess is the Magic Word!';
    }else{
-     listenOnAnswer = 'I have some clues to get the Magic Word, just say, give me a clue!';
+       
+            if (this.event.request.intent.slots.letter.resolutions.resolutionsPerAuthority.status.code == 'ER_SUCCESS_NO_MATCH' ){
+               listenOnAnswer = 'Hmm the word that i understand is not the magic word or a letter into it, I have some clues to get the Magic Word, just say, give me a clue!, or try another letter';
+          }
+       
+     listenOnAnswer = 'The letter you said : ' + lt +' is not in the magic word, I have some clues to get the Magic Word, just say, give me a clue!, or try another letter';
    }
+   
+
     
     
      this.response
-         .speak('The letter you said : ' + lt + ', is ' + cw_c +' times, '+ listenOnAnswer)
+         .speak( listenOnAnswer)
          .listen('Let\'s try another letter or tell me the word you guess is the Magic Word we are looking for.');
     
       this.emit(':responseReady');
@@ -220,17 +229,17 @@ const handlers = {
     case 2:
        clue += 'Here is your clue, It has ' + magic_word.length +' letters, You can get it!';  
         break;
-    case 4:
+    case 3:
        clue += clues[1];  
        clue_used = 1;
         break;
-    case 5:
+    case 4:
         clue += clues[2];
         clue_used = 2;
         break;
    default:
     clue_counter = 0;
-     clue += '<say-as interpret-as="interjection">aha!</say-as> You want to know the answer right?, Just say, Tell me the Magic Word';  
+     clue += '<say-as interpret-as="interjection">aha!</say-as> You want to know the answer right?, Just say, Tell me the Magic Word or just say help, to hear how to play Magic Word';  
   }
    
    
@@ -246,13 +255,29 @@ const handlers = {
     },
    'TellMeAnswerIntent': function () {
        
+       var positive_var= '';
+               var positiveList = ['<say-as interpret-as="interjection">OKy!</say-as>',
+                            '<say-as interpret-as="interjection">wahoo!</say-as>',
+                            '<say-as interpret-as="interjection">yay!</say-as>',
+                            '<say-as interpret-as="interjection">yippee!</say-as>',
+                            '<say-as interpret-as="interjection">hurray!</say-as>'];
+                            
+         positive_var +=positiveList[ Math.floor(Math.random() * positiveList.length)];
+       
     // variables:  hip hip hooray
-    this.emit(':tell', 'Ok, The Magic Word is ' + magic_word + '' );
+    this.emit(':tell',positive_var + ', The Magic Word is <audio src="https://s3.amazonaws.com/alexastoryes/magic_word_clue_light.mp3" /> ' + magic_word + '' );
        
     },
     'AMAZON.HelpIntent': function () {
-        const speechOutput ='Help Message';
-        const reprompt = 'Help Message';
+        const speechOutput =' This is the Alexa skill, Magic Word!. You should try to find the magic word,'+
+' i can provide you clues, you can say the letters of the alphabeth, '+
+' and i will tell you, if it exist, and how many times it is on the magic word,'+
+' as soon as you know which one is the magic word, just <say-as interpret-as="interjection">Yell it to me!</say-as>,'+
+' ,and you will get 5 magic points, If you use four clues,'+
+' your will get three points and, if you use more than four clues you will get 1 point if you tell me the magic word finally,'+
+' But In case you want to know which one was it, Just say, Tell me the Magic Word!,  <say-as interpret-as="interjection">Lets play!</say-as>,  Just say, Alexa, Start Magic Word!';
+
+        const reprompt = 'Do you want to try a game?, Just say, Alexa, Start Magic Word!';
         this.emit(':ask', speechOutput, reprompt);
     },
     'AMAZON.CancelIntent': function () {
