@@ -265,7 +265,7 @@ const handlers = {
          positive_var +=positiveList[ Math.floor(Math.random() * positiveList.length)];
        
     // variables:  hip hip hooray
-    this.emit(':tell',positive_var + ', The Magic Word is <audio src="https://s3.amazonaws.com/alexastoryes/magic_word_clue_light.mp3" /> ' + magic_word + '' );
+    this.emit(':tell',positive_var + ', The Magic Word is <audio src="https://s3.amazonaws.com/alexastoryes/magic_word_clue_light.mp3" /> ' + magic_word + 'Do you wanna play again?, Just say, Alexa, Start Magic Word!' );
        
     },
     'AMAZON.HelpIntent': function () {
