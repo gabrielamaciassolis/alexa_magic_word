@@ -10,55 +10,52 @@ const Alexa = require('alexa-sdk');
 
 const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
 
- 
-    const word_english = [
-                        "DOG",
-                        "BLUE",
-                        "girl",
-                        "apartment"
-                    ];
-                    
-     // Next Levels will have more letters              
-    // const list_words = [
-    //   {type:' an animal ', values:['DOG','CAT']},
-    //   {type: ' a color ', values:['BLUE','YELLOW']},
-    //   {type: ' a school thing ', values :['PENCIL','ERASER']}
-    // ];
-    
-    //     const list_words = [
-    //   {type:' an animal ', values:['DOG','CAT']},
-    //   {type: ' a color ', values:['BLUE','YELLOW']},
-    //   {type: ' a school thing ', values :['PENCIL','ERASER']}
-    // ];
-    
     const list_words = [
         {type:' an animal ', 
 			values:[
 			{name:'DOG',clues:[
-			'It has four legs', 'It can be small like a Toy Poodle, Papillon or a Chihuahua', 'It can be giant like a Mastiff, Komondor, or Saint Bernard'
+			'It has four legs', 'It can be small like a Toy Poodle, Papillon or a Chihuahua or It can be giant like a Mastiff, Komondor, or Saint Bernard'
 			]},
 			{name:'CAT',clues: [
-			'It is like a small dog', 'It says Miau', 'It is small'
+			'It is like a small dog', 'It says Miau'
 			]}
 	]},
         {type:' a color ', 
 			values:[
 			{name:'BLUE',clues:[
-			'It has four legs', 'It can be small like a Toy Poodle, Papillon or a Chihuahua', 'It can be giant like a Mastiff, Komondor, or Saint Bernard'
+			'It is the color od the sky!', 'is the color of the sea!'
 			]},
 			{name:'RED',clues: [
-			'It is the color of the ', 'It says Miau', 'It is small'
+			'It is the color of the apple', 'It is the color of the cherry!'
 			]}
 	]},
         {type:' an number ', 
 			values:[
 			{name:'ONE',clues:[
-			'It has four legs', 'It can be small like a Toy Poodle, Papillon or a Chihuahua', 'It can be giant like a Mastiff, Komondor, or Saint Bernard'
+			'It is the first number after Zero', 'It is before two'
 			]},
 			{name:'TWO',clues: [
-			'Toc Toc', 'How Many ', 'It is small'
+			'Is the number of ears we have', 'Is the number just after One '
 			]}
 	]},
+	        {type:' a place ', 
+			values:[
+			{name:'BEACH',clues:[
+			'It is the first number after Zero', 'It is before two'
+			]},
+			{name:'PARK',clues: [
+			'Is the number of ears we have', 'Is the number just after One '
+			]}
+	]},
+		    {type:' a Fruit ', 
+			values:[
+			{name:'PEAR',clues:[
+			'It is the first number after Zero', 'It is before two'
+			]},
+			{name:'BANANA',clues: [
+			'This fruit is of Yellow Color', 'Is the number just after One '
+			]}
+	]}
     ];
 	
     
@@ -67,7 +64,7 @@ const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
     var magic_word_type = '';
     var clues = [];
     var clue_counter = 0;
-        
+    var clue_used = 0;
         
 const handlers = {
     'LaunchRequest': function () {
@@ -95,12 +92,7 @@ const handlers = {
 
     if(Object.keys(this.attributes).length === 0) { 
        this.attributes.wordsscores = {
-         'numberCorrectTotal': 0,
-         'type': {
-         'animal': { 'numberCorrect': 0},
-         'color': { 'numberCorrect': 0},
-         'school thing': { 'numberCorrect': 0}
-         }
+         'numberCorrectTotal': 0
        }; 
        
        
@@ -110,10 +102,15 @@ const handlers = {
      
        
      } else {
-         
-      // Add variable to greetings
+        
+        var ifScore = '';
+        if (this.attributes.wordsscores.numberCorrectTotal > 0)
+       { ifScore =  'Your current score is '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points'}
+    
+    
+    // Add Welcome Fraces     
       this.response
-     .speak(' Welcome Back!, I am so happy to hear you again, Your current score is '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points, <say-as interpret-as="interjection">okey dokey!</say-as> <say-as interpret-as="interjection">Lets play!</say-as> find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
+     .speak(' Welcome Back!, I am so happy to hear you again,'+ ifScore +', <say-as interpret-as="interjection">okey dokey!</say-as> <say-as interpret-as="interjection">Lets play!</say-as> find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
      .listen('Which letter do you wanna try to guess the word?');
      
          
@@ -138,14 +135,14 @@ const handlers = {
  var listenOnAnswer = '';
  
    if(cw_c != 0 ){
-    listenOnAnswer = 'Let\'s try another letter or tell me what is the word you guess is the Magic Word we are looking for';
+    listenOnAnswer = 'Let\'s try another letter or, tell me what is the word you guess is the Magic Word!';
    }else{
      listenOnAnswer = 'I have some clues to get the Magic Word, just say, give me a clue!';
    }
     
     
      this.response
-         .speak('The letter you said : ' + lt + ', is ' + cw_c +' times, Let\'s try another letter or, tell me the word you guess is the magic word')
+         .speak('The letter you said : ' + lt + ', is ' + cw_c +' times, '+ listenOnAnswer)
          .listen('Let\'s try another letter or tell me the word you guess is the Magic Word we are looking for.');
     
       this.emit(':responseReady');
@@ -160,9 +157,34 @@ const handlers = {
      console.log('WIN: ' + wd + '-' + magic_word );
    
    if(wd == magic_word){
-       // variable wahoo  - well done - wow  - yay  - yippee  - bravo - hurray
-    feedback =   '<say-as interpret-as="interjection">WOW!</say-as> you did it, The Magic Word was, ' + wd + ', Your score is '+ this.attributes.wordsscores.numberCorrectTotal +' of Magic Word points!';
-     this.attributes.wordsscores.numberCorrectTotal = this.attributes.wordsscores.numberCorrectTotal + 5 ;
+       
+       
+      var  scoreValue = 5;
+       
+       if(clue_used == 1)
+       {
+           scoreValue = 3;
+           
+       }else if (clue_used == 2 ){
+           
+           scoreValue = 1;
+       } 
+       
+       
+       this.attributes.wordsscores.numberCorrectTotal = this.attributes.wordsscores.numberCorrectTotal + scoreValue ;
+       
+        var positiveList = ['<say-as interpret-as="interjection">hip hip hooray!</say-as>',
+                            '<say-as interpret-as="interjection">wahoo!</say-as>',
+                            '<say-as interpret-as="interjection">well done!</say-as>',
+                            '<say-as interpret-as="interjection">WOW!</say-as>',
+                            '<say-as interpret-as="interjection">yay!</say-as>',
+                            '<say-as interpret-as="interjection">yippee!</say-as>',
+                            '<say-as interpret-as="interjection">bravo!</say-as>',
+                            '<say-as interpret-as="interjection">hurray!</say-as>'];
+                            
+        var positive_var =positiveList[ Math.floor(Math.random() * positiveList.length)];
+
+    feedback =   positive_var +' you did it!, The Magic Word was, ' + wd + ', Your score is '+ this.attributes.wordsscores.numberCorrectTotal +' of Magic Word points!, Do you want to play again?, just say, Alexa, start Magic Word';
        
    }else{
      // variables  good luck
@@ -191,17 +213,22 @@ const handlers = {
         clue += 'Here is your clue, It start with '+ magic_word.substring(0, 1)  + '<break time="1s"/>  and finishes with ' + magic_word.substring(magic_word.length-1, magic_word.length) + ' <break time="2s"/>';  
         break;
     case 1:
-       clue += 'Here is your clue, <amazon:effect name="whispered"> It is '+ magic_word_type + '</amazon:effect> '; 
-        break;
-    case 2:
-       clue += 'Here is your clue, It has ' + magic_word.length +' letters, Good Look!';  
-        break;
-    case 3:
         clue += 'Here is your clue, <emphasis level="strong"> It is '+ magic_word_type + '</emphasis> ';
         break;
+    case 2:
+       clue += 'Here is your clue, It has ' + magic_word.length +' letters, You can get it!';  
+        break;
+    case 4:
+       clue += clues[1];  
+       clue_used = 1;
+        break;
+    case 5:
+        clue += clues[2];
+        clue_used = 2;
+        break;
    default:
-    clue_counter = 1;
-     clue += 'Here is your clue, <amazon:effect name="whispered"> It is '+ magic_word_type + '</amazon:effect> ';  
+    clue_counter = 0;
+     clue += '<say-as interpret-as="interjection">aha!</say-as> You want to know the answer right?, Just say, Tell me the Magic Word';  
   }
    
    
@@ -211,7 +238,7 @@ const handlers = {
       
    this.response
      .speak(clue)
-     .listen('Which letter do you wanna try to guess the word?');
+     .listen('Which letter do you wanna try to guess the Magic Word?');
       
      this.emit(':responseReady');
     },
@@ -227,16 +254,27 @@ const handlers = {
         this.emit(':ask', speechOutput, reprompt);
     },
     'AMAZON.CancelIntent': function () {
-        this.emit(':tell', 'Ok, let\'s play again soon.');
+        this.emit(':tell', 'Ok, let\'s play again soon. Just say, Alexa, Start Magic Word!');
     },
     'AMAZON.StopIntent': function () {
         
         
+        var positiveList = ['<say-as interpret-as="interjection">hip hip hooray!</say-as>',
+                            '<say-as interpret-as="interjection">Ok!</say-as>'];
+                            
+        var positive_var =positiveList[ Math.floor(Math.random() * positiveList.length)];
+       
+       
+       var count_msg = '';
+       if(this.attributes.wordsscores.numberCorrectTotal != 0)
+       {
+           count_msg =  'Remember!, you have '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points!, share it with your friends.';
+       }
+       else{
+           count_msg = ' Just say, Alexa, Start Magic Word!'
+       }
         
-        
-        
-        // variables:  hip hip hooray
-        this.emit(':tell', 'Ok, let\'s play again soon. Remember!,  you have '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points! ' );
+        this.emit(':tell', positive_var +', let\'s play again soon. '+ count_msg );
     },
   'SessionEndedRequest': function() {
     console.log('session ended!');
