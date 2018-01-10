@@ -141,9 +141,9 @@ const handlers = {
     listenOnAnswer = 'The letter you said : ' + lt +' is ' + cw_c +' times, Let\'s try another letter or, tell me which one is the word you guess is the Magic Word!';
    }else{
        
-            if (this.event.request.intent.slots.letter.resolutions.resolutionsPerAuthority.status.code == 'ER_SUCCESS_NO_MATCH' ){
-               listenOnAnswer = 'Hmm the word that i understand is not the magic word or a letter into it, I have some clues to get the Magic Word, just say, give me a clue!, or try another letter';
-          }
+        //     if (this.event.request.intent.slots.letter.resolutions.resolutionsPerAuthority.status.code == 'ER_SUCCESS_NO_MATCH' ){
+        //       listenOnAnswer = 'Hmm the word that i understand is not the magic word or a letter into it, I have some clues to get the Magic Word, just say, give me a clue!, or try another letter';
+        //   }
        
      listenOnAnswer = 'The letter you said : ' + lt +' is not in the magic word, I have some clues to get the Magic Word, just say, give me a clue!, or try another letter';
    }
@@ -277,8 +277,7 @@ const handlers = {
 ' your will get three points and, if you use more than four clues you will get 1 point if you tell me the magic word finally,'+
 ' But In case you want to know which one was it, Just say, Tell me the Magic Word!,  <say-as interpret-as="interjection">Lets play!</say-as>,  Just say, Alexa, Start Magic Word!';
 
-        const reprompt = 'Do you want to try a game?, Just say, Alexa, Start Magic Word!';
-        this.emit(':ask', speechOutput, reprompt);
+        this.emit(':ask', speechOutput);
     },
     'AMAZON.CancelIntent': function () {
         this.emit(':tell', 'Ok, let\'s play again soon. Just say, Alexa, Start Magic Word!');
