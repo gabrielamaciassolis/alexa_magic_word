@@ -41,19 +41,19 @@ const APP_ID = 'amzn1.ask.skill.1aa703da-8470-42f0-adf7-13269c5cb7c1';  // TODO 
 	        {type:' a place ', 
 			values:[
 			{name:'BEACH',clues:[
-			'It is the first number after Zero', 'It is before two'
+			'It is blue and is plenty of salty water', 'It is like a giant pool free with fishes'
 			]},
 			{name:'PARK',clues: [
-			'Is the number of ears we have', 'Is the number just after One '
+			'This place is so good to play', 'On this place usually there are a lot of kids playing ball games'
 			]}
 	]},
 		    {type:' a Fruit ', 
 			values:[
 			{name:'PEAR',clues:[
-			'It is the first number after Zero', 'It is before two'
+			'This fruit is green outside and white inside', 'This fruit is so juicy and sweet '
 			]},
 			{name:'BANANA',clues: [
-			'This fruit is of Yellow Color', 'Is the number just after One '
+			'This fruit is yellow from outside', 'This fruit is a little like a cucumber '
 			]}
 	]}
     ];
@@ -83,6 +83,7 @@ const handlers = {
   clues = [];
   clue_counter = 0;  
      
+  var intro = '<audio src="https://s3.amazonaws.com/alexastoryes/MagicWord+Intro.mp3" />'
      
      var cw_index   = Math.floor(Math.random() * list_words.length);
          magic_word_type = list_words[cw_index].type
@@ -97,7 +98,7 @@ const handlers = {
        
        
       this.response
-     .speak('Hello! Is Nice to hear you!, Get ready with a piece of paper, and a pencil, <say-as interpret-as="interjection">okey dokey!</say-as>, <say-as interpret-as="interjection">Lets play!</say-as> , Lets find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
+     .speak(intro +' Hello! Is Nice to hear you!, Get ready with a piece of paper, and a pencil, <say-as interpret-as="interjection">okey dokey!</say-as>, <say-as interpret-as="interjection">Lets play!</say-as> , Lets find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
      .listen('Which letter do you wanna try to guess the word?');
      
        
@@ -110,7 +111,7 @@ const handlers = {
     
     // Add Welcome Fraces     
       this.response
-     .speak(' Welcome Back!, I am so happy to hear you again,'+ ifScore +', <say-as interpret-as="interjection">okey dokey!</say-as> <say-as interpret-as="interjection">Lets play!</say-as> find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
+     .speak(intro +' Welcome Back!, I am so happy to hear you again,'+ ifScore +', <say-as interpret-as="interjection">okey dokey!</say-as> <say-as interpret-as="interjection">Lets play!</say-as> find the Magic Word. It is ' + magic_word_type +', and It has ' + magic_word.length +' letters. Guess the letters one by one. Which one do you wanna try?')
      .listen('Which letter do you wanna try to guess the word?');
      
          
@@ -169,7 +170,8 @@ const handlers = {
            
            scoreValue = 1;
        } 
-       
+
+       var positive_var =  '<audio src="https://s3.amazonaws.com/alexastoryes/win.mp3" /> ';
        
        this.attributes.wordsscores.numberCorrectTotal = this.attributes.wordsscores.numberCorrectTotal + scoreValue ;
        
@@ -182,7 +184,7 @@ const handlers = {
                             '<say-as interpret-as="interjection">bravo!</say-as>',
                             '<say-as interpret-as="interjection">hurray!</say-as>'];
                             
-        var positive_var =positiveList[ Math.floor(Math.random() * positiveList.length)];
+         positive_var +=positiveList[ Math.floor(Math.random() * positiveList.length)];
 
     feedback =   positive_var +' you did it!, The Magic Word was, ' + wd + ', Your score is '+ this.attributes.wordsscores.numberCorrectTotal +' of Magic Word points!, Do you want to play again?, just say, Alexa, start Magic Word';
        
@@ -210,7 +212,7 @@ const handlers = {
     
    switch (clue_counter) {
     case 0:
-        clue += 'Here is your clue, It start with '+ magic_word.substring(0, 1)  + '<break time="1s"/>  and finishes with ' + magic_word.substring(magic_word.length-1, magic_word.length) + ' <break time="2s"/>';  
+        clue += 'Here is your clue,The Magic Word starts with '+ magic_word.substring(0, 1)  + '<break time="1s"/>  and finishes with ' + magic_word.substring(magic_word.length-1, magic_word.length) + ' <break time="2s"/>';  
         break;
     case 1:
         clue += 'Here is your clue, <emphasis level="strong"> It is '+ magic_word_type + '</emphasis> ';
@@ -258,6 +260,7 @@ const handlers = {
     },
     'AMAZON.StopIntent': function () {
         
+        var intro = '<audio src="https://s3.amazonaws.com/alexastoryes/MagicWord+Intro.mp3" />'
         
         var positiveList = ['<say-as interpret-as="interjection">hip hip hooray!</say-as>',
                             '<say-as interpret-as="interjection">Ok!</say-as>'];
@@ -274,7 +277,7 @@ const handlers = {
            count_msg = ' Just say, Alexa, Start Magic Word!'
        }
         
-        this.emit(':tell', positive_var +', let\'s play again soon. '+ count_msg );
+        this.emit(':tell', positive_var +', let\'s play again soon. '+ count_msg + intro );
     },
   'SessionEndedRequest': function() {
     console.log('session ended!');
