@@ -230,11 +230,11 @@ const handlers = {
        clue += 'Here is your clue, It has ' + magic_word.length +' letters, You can get it!';  
         break;
     case 3:
-       clue += clues[1];  
+       clue += clues[0];  
        clue_used = 1;
         break;
     case 4:
-        clue += clues[2];
+        clue += clues[1];
         clue_used = 2;
         break;
    default:
@@ -298,7 +298,7 @@ const handlers = {
            count_msg =  'Remember!, you have '+ this.attributes.wordsscores.numberCorrectTotal +' Magic Word points!, share it with your friends.';
        }
        else{
-           count_msg = ' Just say, Alexa, Start Magic Word!'
+           count_msg = ' Just say, Alexa, Start Magic Word!';
        }
         
         this.emit(':tell', positive_var +', let\'s play again soon. '+ count_msg + intro );
